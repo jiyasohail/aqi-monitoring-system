@@ -114,26 +114,45 @@ def load_forecast_from_csv(path: str = "data/predictions.csv") -> pd.DataFrame |
 
 
 def run_and_save(model_name: str = "random_forest", horizon: int = 72):
-    """Generate forecast and save to CSV. Called by CI/CD predict workflow."""
-    from pipelines.fetcher import fetch_historical, OW_API_KEY
+    """Generate forecast and save to CSV."""
+
+    from pipelines.fetcher import fetch_historical
     from pipelines.features import build_features
 
+    # Load API key from environment variable
     api_key = os.getenv("OPENWEATHER_API_KEY")
+
     if not api_key:
         raise EnvironmentError("OPENWEATHER_API_KEY not set.")
 
-    end   = datetime.now(timezone.utc)
-    start = end - timedelta(days=4)  # need enough history for 72h lags
+    end = datetime.now(timezone.utc)
+    start = end - timedelta(days=4)  # enough history for lag features
 
-    df_raw  = fetch_historical(api_key, start, end)
+    print(f"📡 Fetching recent AQI data: {start.date()} → {end.date()}")
+
+    df_raw = fetch_historical(api_key, start, end)
+
+    if df_raw.empty:
+        raise ValueError("No AQI data fetched.")
+
     df_feat = build_features(df_raw)
 
-    df_pred = forecast_72h(df_feat, model_name=model_name, horizon=horizon)
-    os.makedirs("data", exist_ok=True)
-    df_pred.to_csv("data/predictions.csv", index=False)
-    print(f"✅  Saved {len(df_pred)} predictions to data/predictions.csv")
-    return df_pred
+    print("🤖 Generating predictions...")
 
+    df_pred = forecast_72h(
+        df_feat,
+        model_name=model_name,
+        horizon=horizon
+    )
+
+    os.makedirs("data", exist_ok=True)
+
+    out_path = "data/predictions.csv"
+    df_pred.to_csv(out_path, index=False)
+
+    print(f"✅ Saved {len(df_pred)} predictions to {out_path}")
+
+    return df_pred
 
 if __name__ == "__main__":
     preds = run_and_save()
