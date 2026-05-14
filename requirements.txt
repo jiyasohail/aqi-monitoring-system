@@ -1,0 +1,24 @@
+# Core data
+pandas>=2.1.0
+numpy>=1.26.0
+requests>=2.31.0
+
+# ML
+scikit-learn>=1.4.0
+xgboost>=2.0.0
+
+# Deep learning (optional — comment out if not needed)
+tensorflow>=2.15.0
+
+# Feature store
+hopsworks>=3.7.0
+
+# Dashboard
+streamlit>=1.35.0
+plotly>=5.20.0
+
+# Explainability
+shap>=0.45.0
+
+# Utilities
+python-dotenv>=1.0.0
