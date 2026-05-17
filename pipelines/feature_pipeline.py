@@ -15,8 +15,8 @@ from pipelines.fetcher  import fetch_historical
 from pipelines.features import build_features
 
 # ── Config — read AFTER load_dotenv ───────────────────────────────────────────
-OW_API_KEY        = os.environ.get("9cf7f0badb702ea330f039b1f5c0033f") or os.getenv("9cf7f0badb702ea330f039b1f5c0033f")
-HOPSWORKS_API_KEY = os.environ.get("wmeVKxYwR7DUPB4Q.VuXvBG1S8ieXjTUcHYD7wAneJhLaVGSQ6pC5HLWDpnnXzIH3lcEIIVmwHOCCDnK9")
+OW_API_KEY        = os.environ.get("OPENWEATHER_API_KEY")
+HOPSWORKS_API_KEY = os.environ.get("HOPSWORKS_API_KEY")
 HOPSWORKS_PROJECT = os.environ.get("AQI_Karachi", "aqi_karachi")
 
 FEATURE_GROUP_NAME    = "aqi_features"

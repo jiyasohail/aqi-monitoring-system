@@ -1,160 +1,106 @@
-# 🌫️ Karachi AQI Forecast
+# 🌫️ Karachi Air Quality Index (AQI) Forecasting System
 
-End-to-end serverless ML pipeline for predicting Air Quality Index (AQI) in Karachi for the next 72 hours.
-
-**Live dashboard · Automated retraining · Feature Store · SHAP explainability**
+An end-to-end **machine learning + data engineering project** that predicts the Air Quality Index (AQI) for Karachi up to 3 days in advance using environmental data, feature engineering pipelines, and interactive visualization dashboards.
 
 ---
 
-## Architecture
+## 🚀 Project Overview
 
-```
-OpenWeather API
-      │
-      ▼
- feature_pipeline.py  ◄──── GitHub Actions (hourly)
-      │  (fetch + engineer features)
-      ▼
- Hopsworks Feature Store  (or local CSV in dev mode)
-      │
-      ▼
- train_pipeline.py  ◄──── GitHub Actions (daily 02:00 UTC)
-      │  (RF · Ridge · XGBoost · TF MLP)
-      ▼
- Hopsworks Model Registry  →  predict.py  →  predictions.csv
-                                                   │
-                                                   ▼
-                                          Streamlit Dashboard
-```
+This project focuses on building a **serverless AQI forecasting pipeline** that automates:
+
+- Data collection from environmental APIs
+- Feature engineering and transformation
+- Machine learning model training
+- Real-time predictions via a web dashboard
+- Model interpretation using SHAP
+
+The system is designed to simulate a **production-grade MLOps pipeline** using modern data science tools.
 
 ---
 
-## Tech Stack
+## 🧠 Key Features
 
-| Layer | Technology |
-|---|---|
-| Data API | OpenWeather Air Pollution API |
-| Feature Store | Hopsworks |
-| ML Models | Random Forest, Ridge, XGBoost, TensorFlow MLP |
-| Explainability | SHAP |
-| Automation | GitHub Actions |
-| Dashboard | Streamlit + Plotly |
-| Language | Python 3.12 |
+### 📊 1. Interactive AQI Dashboard
+- Real-time AQI visualization
+- 24-hour trend analysis
+- Pollutant breakdown (PM2.5, PM10, NO2, O3, SO2)
+- Clean pastel UI built with Streamlit
 
----
+### 📂 2. Data Handling
+- CSV upload support for custom datasets
+- Mock data fallback system
+- Time-series structured AQI data
 
-## Project Structure
+### 📈 3. Analytics & Visualization
+- Plotly-based interactive charts
+- Trend analysis and comparison views
+- Feature importance visualization (SHAP-ready)
 
-```
-aqi_karachi/
-├── pipelines/
-│   ├── fetcher.py           # OpenWeather API helpers
-│   ├── features.py          # Feature engineering + EPA AQI formula
-│   ├── feature_pipeline.py  # Hourly ingestion pipeline
-│   ├── backfill.py          # Historical data backfill
-│   ├── train_pipeline.py    # Multi-model training + SHAP
-│   └── predict.py           # 72h recursive forecasting
-├── dashboard/
-│   └── app.py               # Streamlit dashboard
-├── .github/workflows/
-│   ├── hourly_feature_pipeline.yml
-│   └── train_daily.yml
-├── data/                    # Local CSV fallbacks (gitignored in prod)
-├── models/                  # Saved models + metrics + SHAP
-└── requirements.txt
-```
+### 🔮 4. Forecasting System (Planned / In Progress)
+- Predict AQI for next 3 days
+- ML-based regression models (Random Forest / Linear Regression / TensorFlow)
+- Evaluation using RMSE, MAE, and R²
+
+### ⚙️ 5. Feature Engineering Pipeline (Planned)
+- Time-based features (hour, day, month)
+- Lag features and rolling averages
+- AQI trend derivatives
+
+### 🔄 6. MLOps Pipeline (Planned)
+- Automated training using GitHub Actions / Airflow
+- Feature store integration (Hopsworks / Vertex AI)
+- Model versioning and registry support
 
 ---
 
-## Setup
+## 🛠️ Tech Stack
 
-### 1. Clone & install
-
-```bash
-git clone https://github.com/YOUR_USERNAME/aqi_karachi.git
-cd aqi_karachi
-pip install -r requirements.txt
-```
-
-### 2. Set environment variables
-
-Create a `.env` file (never commit this):
-
-```env
-OPENWEATHER_API_KEY=your_key_here
-HOPSWORKS_API_KEY=your_key_here
-HOPSWORKS_PROJECT=aqi_karachi
-```
-
-Get a free OpenWeather key at https://openweathermap.org/api
-
-Get a free Hopsworks account at https://app.hopsworks.ai
-
-### 3. Backfill historical data
-
-```bash
-python -m pipelines.backfill --days 365
-```
-
-### 4. Train models
-
-```bash
-python -m pipelines.train_pipeline
-```
-
-### 5. Run dashboard
-
-```bash
-streamlit run dashboard/app.py
-```
+- Python 🐍  
+- Streamlit 🌐  
+- Pandas / NumPy 📊  
+- Scikit-learn / TensorFlow 🤖  
+- Plotly 📈  
+- SHAP 🔍  
+- Git & GitHub 🔧  
+- (Planned) Hopsworks / Vertex AI ☁️  
+- (Planned) Airflow / GitHub Actions 🔄  
 
 ---
 
-## GitHub Actions CI/CD
+## 📷 Dashboard Preview
 
-Add these secrets in **Settings → Secrets → Actions**:
+> Interactive AQI dashboard with real-time visualization and forecasting UI.
 
-| Secret | Description |
-|---|---|
-| `OPENWEATHER_API_KEY` | OpenWeather API key |
-| `HOPSWORKS_API_KEY` | Hopsworks API key |
-| `HOPSWORKS_PROJECT` | Hopsworks project name |
-
-Workflows run automatically:
-- **Hourly**: `hourly_feature_pipeline.yml` — fetches new data, engineers features
-- **Daily 02:00 UTC**: `train_daily.yml` — retrains models, saves predictions
+*(Add screenshot here)*
 
 ---
 
-## Models & Features
+## 📌 Project Goals
 
-**10 raw features** from OpenWeather: `pm2_5, pm10, co, no, no2, o3, so2, nh3` + weather (temp, humidity, wind, pressure)
-
-**~80 engineered features**:
-- Time cyclical: `hour_sin/cos`, `dow_sin/cos`, `month_sin/cos`
-- Lag features: 1h, 3h, 6h, 12h, 24h, 48h, 72h
-- Rolling stats: mean/std/max over 6h, 12h, 24h, 48h windows
-- AQI change rate
-
-**Target**: `aqi_next_24h` — EPA-standard AQI 24 hours ahead
-
-**AQI** is computed using **EPA linear interpolation** between PM2.5 and PM10 breakpoints.
+- Build a production-style AQI forecasting system
+- Learn full ML lifecycle (data → model → deployment)
+- Implement MLOps concepts in a real-world scenario
+- Create a portfolio-ready data science project
 
 ---
 
-## AQI Scale
+## 🔮 Future Improvements
 
-| AQI | Category | Health Impact |
-|---|---|---|
-| 0–50 | Good | No risk |
-| 51–100 | Moderate | Unusually sensitive people should consider limiting prolonged exertion |
-| 101–150 | Unhealthy for Sensitive Groups | Sensitive groups should limit prolonged outdoor exertion |
-| 151–200 | Unhealthy | Everyone may begin to experience health effects |
-| 201–300 | Very Unhealthy | Health alert — everyone may experience serious effects |
-| 301+ | Hazardous | Health emergency |
+- Live AQI API integration (AQICN / OpenWeather)
+- Fully trained ML forecasting model
+- SHAP-based explainability dashboard
+- Cloud deployment (Streamlit Cloud / AWS)
+- Automated CI/CD pipelines
 
 ---
 
-## License
+## 👩‍💻 Author
 
-MIT
+Built by **Jiya**  
+Computer Science Student | Aspiring Data Analyst
+
+---
+
+## ⭐ Status
+
+🚧 In Progress — actively evolving into a full MLOps system

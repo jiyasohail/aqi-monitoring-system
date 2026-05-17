@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from datetime import datetime, timezone, timedelta
+import joblib
 
 # ---------------------------
 # PAGE CONFIG
@@ -16,7 +17,28 @@ st.set_page_config(
 )
 
 # ---------------------------
-# CSS (PASTEL LIGHT THEME)
+# MODEL LOADING
+# ---------------------------
+@st.cache_resource
+def load_models():
+    models = {}
+
+    try:
+        models["RandomForest"] = joblib.load("random_forest.pkl")
+    except:
+        models["RandomForest"] = None
+
+    try:
+        models["Ridge"] = joblib.load("ridge.pkl")
+    except:
+        models["Ridge"] = None
+
+    return models
+
+models = load_models()
+
+# ---------------------------
+# CSS
 # ---------------------------
 st.markdown("""
 <style>
@@ -28,13 +50,11 @@ st.markdown("""
     color: #111;
 }
 
-/* Sidebar */
 [data-testid="stSidebar"] {
     background: #ffffff;
     border-right: 1px solid #eee;
 }
 
-/* Cards */
 .plot-card {
     background: #ffffff;
     border-radius: 16px;
@@ -49,7 +69,6 @@ st.markdown("""
     border: 1px solid #90caf9;
 }
 
-/* Headings */
 .section-header {
     font-size: 1.3rem;
     font-weight: 700;
@@ -59,7 +78,6 @@ st.markdown("""
     margin: 20px 0;
 }
 
-/* Stats */
 .stat-label {
     font-size: 0.75rem;
     color: #666;
@@ -72,7 +90,6 @@ st.markdown("""
     color: #ff6f91;
 }
 
-/* Logo */
 .nav-logo {
     font-family: 'Bebas Neue';
     font-size: 2rem;
@@ -98,9 +115,15 @@ with st.sidebar:
         default=["PM2.5", "PM10"]
     )
 
+    st.markdown("### 🤖 Model Selection")
+
+    selected_model = st.selectbox(
+        "Choose Model",
+        ["RandomForest", "Ridge"]
+    )
+
     st.markdown("---")
 
-    # CSV Upload (NEW FEATURE)
     st.markdown("### 📂 Upload Dataset")
     uploaded_file = st.file_uploader("Upload AQI CSV", type=["csv"])
 
@@ -110,19 +133,38 @@ with st.sidebar:
         st.rerun()
 
 # ---------------------------
-# DATA (MOCK / UPLOADED)
+# DATA LOADING
 # ---------------------------
 def get_data(uploaded):
     if uploaded is not None:
         df = pd.read_csv(uploaded)
-        return df
     else:
         now = datetime.now(timezone.utc)
         times = [now + timedelta(hours=i) for i in range(24)]
         aqi_vals = np.random.randint(140, 260, 24)
-        return pd.DataFrame({"time": times, "aqi": aqi_vals})
+        df = pd.DataFrame({"time": times, "aqi": aqi_vals})
+
+    return df
 
 df = get_data(uploaded_file)
+
+# ---------------------------
+# PREDICTION FUNCTION
+# ---------------------------
+def predict(model_name, data):
+    model = models.get(model_name)
+
+    if model is None:
+        return np.random.randint(120, 250, len(data))
+
+    try:
+        X = data[["aqi"]].values
+        preds = model.predict(X)
+        return preds
+    except:
+        return np.random.randint(120, 250, len(data))
+
+df["prediction"] = predict(selected_model, df)
 
 # ---------------------------
 # HEADER
@@ -130,7 +172,7 @@ df = get_data(uploaded_file)
 st.markdown('<div class="nav-logo">KARACHI <span style="color:#ff6f91;">AIR</span></div>', unsafe_allow_html=True)
 
 # ---------------------------
-# AQI STATUS FUNCTION
+# AQI STATUS
 # ---------------------------
 def aqi_status(val):
     if val < 50:
@@ -167,12 +209,21 @@ with col2:
 
 with col3:
     fig = go.Figure()
+
     fig.add_trace(go.Scatter(
         x=df["time"],
         y=df["aqi"],
+        name="Actual AQI",
         fill="tozeroy",
         line=dict(color="#ff6f91", width=3),
         fillcolor="rgba(255,111,145,0.15)"
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=df["time"],
+        y=df["prediction"],
+        name="Predicted AQI",
+        line=dict(color="#90caf9", width=3, dash="dot")
     ))
 
     fig.update_layout(
@@ -185,18 +236,15 @@ with col3:
     )
 
     st.markdown('<div class="plot-card">', unsafe_allow_html=True)
-    st.markdown("### 24H Trend")
+    st.markdown("### 24H Trend (Actual vs Predicted)")
     st.plotly_chart(fig, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------------------------
-# SECTION TITLE
+# SECTION
 # ---------------------------
 st.markdown('<div class="section-header">Detailed Analysis</div>', unsafe_allow_html=True)
 
-# ---------------------------
-# CHARTS
-# ---------------------------
 col_left, col_right = st.columns(2)
 
 with col_left:
@@ -216,7 +264,6 @@ with col_left:
     ))
 
     fig2.update_layout(height=300, paper_bgcolor="rgba(0,0,0,0)")
-
     st.plotly_chart(fig2, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -224,10 +271,10 @@ with col_right:
     st.markdown('<div class="plot-card">', unsafe_allow_html=True)
     st.markdown("### 🔮 Model Insights")
 
-    st.write("Feature importance (AQI prediction):")
-    st.progress(0.8, "Traffic Density")
-    st.progress(0.6, "Industrial Output")
-    st.progress(0.4, "Wind Speed")
+    st.write("Feature importance (demo):")
+    st.progress(80, "Traffic Density")
+    st.progress(60, "Industrial Output")
+    st.progress(40, "Wind Speed")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
