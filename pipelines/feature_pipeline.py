@@ -15,9 +15,9 @@ from pipelines.fetcher  import fetch_historical
 from pipelines.features import build_features
 
 # ── Config — read AFTER load_dotenv ───────────────────────────────────────────
-OW_API_KEY        = os.environ.get("OPENWEATHER_API_KEY")
-HOPSWORKS_API_KEY = os.environ.get("HOPSWORKS_API_KEY")
-HOPSWORKS_PROJECT = os.environ.get("HOPSWORKS_PROJECT", "aqi_karachi")
+# OW_API_KEY        = os.environ.get("OPENWEATHER_API_KEY")
+# HOPSWORKS_API_KEY = os.environ.get("HOPSWORKS_API_KEY")
+# HOPSWORKS_PROJECT = os.environ.get("HOPSWORKS_PROJECT", "aqi_karachi")
 
 FEATURE_GROUP_NAME    = "aqi_features"
 FEATURE_GROUP_VERSION = 1
@@ -25,6 +25,17 @@ CHUNK_DAYS = 25
 
 
 def run(days: int = 365, start_date=None):
+    OW_API_KEY = os.environ.get("OPENWEATHER_API_KEY")
+    HOPSWORKS_API_KEY = os.environ.get("HOPSWORKS_API_KEY")
+    HOPSWORKS_PROJECT = os.environ.get("HOPSWORKS_PROJECT", "aqi_karachi")
+    
+    print(f"DEBUG: OW_API_KEY = {'SET ✅' if OW_API_KEY else 'NOT SET ❌'}")
+    print(f"DEBUG: HOPSWORKS  = {'SET ✅' if HOPSWORKS_API_KEY else 'not set (will use CSV)'}")
+
+    if not OW_API_KEY:
+        print("❌  OPENWEATHER_API_KEY is not set.")
+        sys.exit(1)
+
     # ── Debug: print what we found ─────────────────────────────────────────────
     print(f"DEBUG: OW_API_KEY = {'SET ✅' if OW_API_KEY else 'NOT SET ❌'}")
     print(f"DEBUG: HOPSWORKS  = {'SET ✅' if HOPSWORKS_API_KEY else 'not set (will use CSV)'}")
