@@ -17,7 +17,7 @@ from pipelines.features import build_features
 # ── Config — read AFTER load_dotenv ───────────────────────────────────────────
 OW_API_KEY        = os.environ.get("OPENWEATHER_API_KEY")
 HOPSWORKS_API_KEY = os.environ.get("HOPSWORKS_API_KEY")
-HOPSWORKS_PROJECT = os.environ.get("AQI_Karachi", "aqi_karachi")
+HOPSWORKS_PROJECT = os.environ.get("HOPSWORKS_PROJECT", "aqi_karachi")
 
 FEATURE_GROUP_NAME    = "aqi_features"
 FEATURE_GROUP_VERSION = 1
