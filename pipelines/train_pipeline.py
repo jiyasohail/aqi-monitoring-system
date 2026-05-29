@@ -38,16 +38,16 @@ MODEL_DIR = "models"
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 def load_features() -> pd.DataFrame:
-    """Load features from Hopsworks or fallback to local CSV."""
-    if HOPSWORKS_API_KEY:
-        return _load_from_hopsworks()
+    """Load features — always try CSV first, then Hopsworks."""
     csv = "data/features_backfill.csv"
     if os.path.exists(csv):
         print(f"📂  Loading features from {csv}")
         df = pd.read_csv(csv, parse_dates=["time"])
         return df
+    # Only try Hopsworks if CSV doesn't exist
+    if HOPSWORKS_API_KEY:
+        return _load_from_hopsworks()
     raise FileNotFoundError("No feature data found. Run backfill.py first.")
-
 
 def _load_from_hopsworks() -> pd.DataFrame:
     import hopsworks

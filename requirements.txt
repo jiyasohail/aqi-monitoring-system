@@ -19,3 +19,6 @@ shap>=0.45.0
 
 # Utilities
 python-dotenv>=1.0.0
+
+#(Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned) ; (& c:\Users\HIBA\Documents\aqi_karachi_10Pearls\venv\Scripts\Activate.ps1)
+# python -m streamlit run dashboard/app.py                                          

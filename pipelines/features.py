@@ -5,6 +5,15 @@ Computes time features, lag features, rolling stats, AQI target via EPA formula.
 
 import numpy as np
 import pandas as pd
+import os
+import tempfile
+
+tmp_dir = tempfile.gettempdir()
+
+os.environ["TMPDIR"] = tmp_dir
+os.environ["TEMP"] = tmp_dir
+os.environ["TMP"] = tmp_dir
+os.environ["HOPSWORKS_CLIENT_TEMP_DIR"] = tmp_dir
 
 # ── EPA AQI breakpoints ────────────────────────────────────────────────────────
 # Each entry: (C_low, C_high, I_low, I_high)
