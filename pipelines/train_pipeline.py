@@ -242,10 +242,10 @@ def _push_to_hopsworks(model_name: str, metrics: dict):
     mr = project.get_model_registry()
     model_dir = MODEL_DIR
     hw_model = mr.sklearn.create_model(
-        name=f"aqi_{model_name}",
-        metrics=metrics,
-        description=f"AQI 24h forecast model: {model_name}",
-    )
+    name=f"aqi_{model_name}",
+    metrics={"rmse": float(metrics["rmse"]), "mae": float(metrics["mae"]), "r2": float(metrics["r2"])},
+    description=f"AQI 24h forecast model: {model_name}",
+)
     hw_model.save(model_dir)
     print(f"✅  Pushed model '{model_name}' to Hopsworks Model Registry.")
 
