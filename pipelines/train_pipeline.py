@@ -196,7 +196,12 @@ def run():
     # ── Push best sklearn model to Hopsworks ───────────────────────────────────
     if HOPSWORKS_API_KEY:
         best = metrics_df.iloc[0]["model"].lower().replace(" ", "_")
-        _push_to_hopsworks(best, metrics_df.iloc[0].to_dict())
+        best_row = metrics_df.iloc[0]
+    _push_to_hopsworks(best, {
+        "rmse": float(best_row["rmse"]),
+        "mae":  float(best_row["mae"]),
+        "r2":   float(best_row["r2"]),
+    })
 
     print(f"[{datetime.now(timezone.utc).isoformat()}] ── Training Pipeline Done ──")
 
