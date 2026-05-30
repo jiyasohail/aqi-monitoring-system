@@ -1,106 +1,259 @@
-# 🌫️ Karachi Air Quality Index (AQI) Forecasting System
+# 🌍 Karachi AQI Forecasting System
 
-An end-to-end **machine learning + data engineering project** that predicts the Air Quality Index (AQI) for Karachi up to 3 days in advance using environmental data, feature engineering pipelines, and interactive visualization dashboards.
+### End-to-End MLOps Pipeline for Real-Time Air Quality Forecasting
 
----
+An automated, cloud-native MLOps solution that predicts **Karachi's Air Quality Index (AQI) up to 72 hours ahead** using machine learning, feature engineering, continuous retraining, and real-time monitoring.
 
-## 🚀 Project Overview
+The system continuously ingests environmental data, retrains models on fresh observations, and serves forecasts through an interactive dashboard.
 
-This project focuses on building a **serverless AQI forecasting pipeline** that automates:
-
-- Data collection from environmental APIs
-- Feature engineering and transformation
-- Machine learning model training
-- Real-time predictions via a web dashboard
-- Model interpretation using SHAP
-
-The system is designed to simulate a **production-grade MLOps pipeline** using modern data science tools.
+🚀 **Live Dashboard:** https://huggingface.co/spaces/jsohail/KarachiAQIForecast_10Pearls
 
 ---
 
-## 🧠 Key Features
+## 📌 Project Overview
 
-### 📊 1. Interactive AQI Dashboard
-- Real-time AQI visualization
-- 24-hour trend analysis
-- Pollutant breakdown (PM2.5, PM10, NO2, O3, SO2)
-- Clean pastel UI built with Streamlit
+Air quality directly impacts public health, transportation planning, and environmental decision-making. This project was developed to provide near real-time AQI forecasting for Karachi through a fully automated MLOps pipeline.
 
-### 📂 2. Data Handling
-- CSV upload support for custom datasets
-- Mock data fallback system
-- Time-series structured AQI data
+The system:
 
-### 📈 3. Analytics & Visualization
-- Plotly-based interactive charts
-- Trend analysis and comparison views
-- Feature importance visualization (SHAP-ready)
-
-### 🔮 4. Forecasting System (Planned / In Progress)
-- Predict AQI for next 3 days
-- ML-based regression models (Random Forest / Linear Regression / TensorFlow)
-- Evaluation using RMSE, MAE, and R²
-
-### ⚙️ 5. Feature Engineering Pipeline (Planned)
-- Time-based features (hour, day, month)
-- Lag features and rolling averages
-- AQI trend derivatives
-
-### 🔄 6. MLOps Pipeline (Planned)
-- Automated training using GitHub Actions / Airflow
-- Feature store integration (Hopsworks / Vertex AI)
-- Model versioning and registry support
+* Collects live pollution data from OpenWeather APIs
+* Engineers advanced temporal and statistical features
+* Stores features in a centralized Feature Store
+* Retrains multiple machine learning models daily
+* Tracks model performance automatically
+* Deploys forecasts to a live interactive dashboard
 
 ---
 
-## 🛠️ Tech Stack
+## 🏗️ System Architecture
 
-- Python 🐍  
-- Streamlit 🌐  
-- Pandas / NumPy 📊  
-- Scikit-learn / TensorFlow 🤖  
-- Plotly 📈  
-- SHAP 🔍  
-- Git & GitHub 🔧  
-- (Planned) Hopsworks / Vertex AI ☁️  
-- (Planned) Airflow / GitHub Actions 🔄  
-
----
-
-## 📷 Dashboard Preview
-
-> Interactive AQI dashboard with real-time visualization and forecasting UI.
-
-*(Add screenshot here)*
-
----
-
-## 📌 Project Goals
-
-- Build a production-style AQI forecasting system
-- Learn full ML lifecycle (data → model → deployment)
-- Implement MLOps concepts in a real-world scenario
-- Create a portfolio-ready data science project
+```text
+                 OpenWeather API
+                        │
+                        ▼
+          Hourly Feature Pipeline
+             (GitHub Actions)
+                        │
+                        ▼
+           Hopsworks Feature Store
+                        │
+                        ▼
+            Daily Training Pipeline
+             (GitHub Actions)
+                        │
+                        ▼
+      Random Forest | Ridge | XGBoost
+                        │
+                        ▼
+         Hopsworks Model Registry
+                        │
+                        ▼
+     Gradio Dashboard (Hugging Face)
+```
 
 ---
 
-## 🔮 Future Improvements
+## ⚡ Key Features
 
-- Live AQI API integration (AQICN / OpenWeather)
-- Fully trained ML forecasting model
-- SHAP-based explainability dashboard
-- Cloud deployment (Streamlit Cloud / AWS)
-- Automated CI/CD pipelines
+### 📊 Real-Time Data Pipeline
+
+* Automated hourly data ingestion
+* Live pollutant monitoring
+* Historical data backfilling
+* Centralized feature storage using Hopsworks
+
+### 🧠 Advanced Feature Engineering
+
+* EPA-standard AQI calculation
+* Cyclical time encoding (hour, day, month)
+* Multi-step lag features
+* Rolling window statistics
+* AQI trend and change-rate calculations
+
+### 🤖 Machine Learning Models
+
+The system trains and evaluates multiple forecasting models:
+
+| Model            | Purpose                        |
+| ---------------- | ------------------------------ |
+| Random Forest    | Non-linear ensemble learning   |
+| Ridge Regression | Linear baseline model          |
+| XGBoost          | Gradient boosting optimization |
+
+Each model is evaluated using:
+
+* RMSE (Root Mean Squared Error)
+* MAE (Mean Absolute Error)
+* R² Score
+
+The best-performing model is automatically registered and deployed.
+
+### 📈 Model Explainability
+
+* SHAP feature importance analysis
+* Model interpretability reporting
+* Automated feature ranking generation
+
+### 🔄 Automated MLOps Workflow
+
+#### Hourly Pipeline
+
+* Fetches latest AQI data
+* Performs feature engineering
+* Updates Feature Store
+
+#### Daily Pipeline
+
+* Retrains all models
+* Evaluates performance
+* Generates SHAP insights
+* Pushes best model to Model Registry
+
+---
+
+## 🛠️ Technology Stack
+
+| Category             | Technology                    |
+| -------------------- | ----------------------------- |
+| Programming Language | Python 3.11                   |
+| Data Source          | OpenWeather Air Pollution API |
+| Feature Store        | Hopsworks                     |
+| Model Registry       | Hopsworks                     |
+| Machine Learning     | Scikit-Learn, XGBoost         |
+| Explainability       | SHAP                          |
+| Automation           | GitHub Actions                |
+| Dashboard            | Gradio                        |
+| Visualization        | Plotly                        |
+
+---
+
+## 📂 Project Structure
+
+```text
+aqi-monitoring-system/
+│
+├── pipelines/
+│   ├── fetcher.py
+│   ├── features.py
+│   ├── feature_pipeline.py
+│   ├── backfill.py
+│   ├── train_pipeline.py
+│   └── predict.py
+│
+├── dashboard/
+│   └── app.py
+│
+├── app.py
+│
+├── .github/
+│   └── workflows/
+│       ├── hourly_feature_pipeline.yml
+│       └── train_daily.yml
+│
+├── data/
+│   └── features_backfill.csv
+│
+├── models/
+│   ├── random_forest.pkl
+│   ├── ridge.pkl
+│   ├── xgboost.pkl
+│   ├── metrics.csv
+│   └── shap_importance.csv
+│
+└── requirements.txt
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/jiyasohail/aqi-monitoring-system.git
+cd aqi-monitoring-system
+```
+
+### 2. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Configure Environment Variables
+
+Create a `.env` file:
+
+```env
+OPENWEATHER_API_KEY=your_api_key
+HOPSWORKS_API_KEY=your_api_key
+HOPSWORKS_PROJECT=your_project_name
+```
+
+### 4. Backfill Historical Data
+
+```bash
+python -m pipelines.backfill --days 365
+```
+
+### 5. Train Models
+
+```bash
+python -m pipelines.train_pipeline
+```
+
+### 6. Launch Dashboard
+
+```bash
+python app.py
+```
+
+---
+
+## 🔐 GitHub Actions Secrets
+
+The following repository secrets are required for automated execution:
+
+| Secret              | Description            |
+| ------------------- | ---------------------- |
+| OPENWEATHER_API_KEY | OpenWeather API Key    |
+| HOPSWORKS_API_KEY   | Hopsworks API Key      |
+| HOPSWORKS_PROJECT   | Hopsworks Project Name |
+
+---
+
+## 📊 Dashboard Highlights
+
+The dashboard provides:
+
+* Current AQI monitoring
+* 72-hour AQI forecasting
+* Pollutant concentration breakdown
+* Model performance insights
+* Interactive visual analytics
+* Real-time environmental monitoring
+
+---
+
+## 🎯 Future Improvements
+
+* Deep Learning forecasting models (LSTM / GRU)
+* Multi-city AQI monitoring
+* Weather-integrated forecasting
+* Alert and notification system
+* Docker & Kubernetes deployment
+* Model drift monitoring
 
 ---
 
 ## 👩‍💻 Author
 
-Built by **Jiya**  
-Computer Science Student | Aspiring Data Analyst
+**Javariya Sohail**
+
+Computer Science Student | Data Analytics Enthusiast | MLOps Practitioner
+
+Developed during the **10Pearls Internship Program (2026)** as a real-world machine learning and MLOps project focused on environmental intelligence and predictive analytics.
 
 ---
 
-## ⭐ Status
-
-🚧 In Progress — actively evolving into a full MLOps system
+⭐ If you found this project useful, consider giving it a star on GitHub.
